@@ -6,12 +6,12 @@
     clippy::unused_unit
 )]
 
-use std::ffi::c_void;
+use std::ffi::{c_char, c_void};
 
 #[repr(C)]
 pub struct OcioGpuTexture2DInfo {
-    pub texture_name: *const i8,
-    pub sampler_name: *const i8,
+    pub texture_name: *const c_char,
+    pub sampler_name: *const c_char,
     pub width: u32,
     pub height: u32,
     pub channel: i32,
@@ -22,8 +22,8 @@ pub struct OcioGpuTexture2DInfo {
 
 #[repr(C)]
 pub struct OcioGpuTexture3DInfo {
-    pub texture_name: *const i8,
-    pub sampler_name: *const i8,
+    pub texture_name: *const c_char,
+    pub sampler_name: *const c_char,
     pub edge_len: u32,
     pub interpolation: i32,
     pub binding_index: u32,
@@ -31,13 +31,13 @@ pub struct OcioGpuTexture3DInfo {
 
 #[repr(C)]
 pub struct OcioGpuUniformInfo {
-    pub name: *const i8,
+    pub name: *const c_char,
     pub type_: i32,
     pub buffer_offset: usize,
     pub value_count: usize,
 }
 
-pub type OcioLogCallback = Option<unsafe extern "C" fn(message: *const i8)>;
+pub type OcioLogCallback = Option<unsafe extern "C" fn(message: *const c_char)>;
 pub type OcioComputeHashCallback = Option<
     unsafe extern "C" fn(
         input: *const u8,
@@ -49,28 +49,28 @@ pub type OcioComputeHashCallback = Option<
 
 unsafe extern "C" {
     // --- Error state ---
-    pub fn ocio_error_get_last() -> *const i8;
+    pub fn ocio_error_get_last() -> *const c_char;
     pub fn ocio_error_clear_last();
 
     // --- Runtime ---
     pub fn ocio_runtime_is_stub() -> bool;
 
     // --- Global utility functions ---
-    pub fn ocio_get_version() -> *const i8;
+    pub fn ocio_get_version() -> *const c_char;
     pub fn ocio_get_version_hex() -> i32;
     pub fn ocio_get_logging_level() -> i32;
     pub fn ocio_set_logging_level(level: i32);
-    pub fn ocio_log_message(level: i32, message: *const i8);
+    pub fn ocio_log_message(level: i32, message: *const c_char);
     pub fn ocio_set_logging_callback(callback: OcioLogCallback);
     pub fn ocio_reset_logging_callback();
     pub fn ocio_set_compute_hash_callback(callback: OcioComputeHashCallback);
     pub fn ocio_reset_compute_hash_callback();
-    pub fn ocio_resolve_config_path(originalPath: *const i8) -> *const i8;
-    pub fn ocio_extract_ocioz_archive(archivePath: *const i8, destinationDir: *const i8);
-    pub fn ocio_get_env_variable(name: *const i8) -> *const i8;
-    pub fn ocio_set_env_variable(name: *const i8, value: *const i8);
-    pub fn ocio_unset_env_variable(name: *const i8);
-    pub fn ocio_is_env_variable_present(name: *const i8) -> bool;
+    pub fn ocio_resolve_config_path(originalPath: *const c_char) -> *const c_char;
+    pub fn ocio_extract_ocioz_archive(archivePath: *const c_char, destinationDir: *const c_char);
+    pub fn ocio_get_env_variable(name: *const c_char) -> *const c_char;
+    pub fn ocio_set_env_variable(name: *const c_char, value: *const c_char);
+    pub fn ocio_unset_env_variable(name: *const c_char);
+    pub fn ocio_is_env_variable_present(name: *const c_char) -> bool;
 
     // --- Global config ---
     pub fn ocio_get_current_config() -> *mut c_void;
@@ -95,7 +95,7 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_builtin_config_registry_get_builtin_config_by_name(
         handle: *mut c_void,
-        configName: *const i8,
+        configName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_builtin_config_registry_is_builtin_config_recommended(
         handle: *mut c_void,
@@ -107,46 +107,46 @@ unsafe extern "C" {
     pub fn ocio_builtin_transform_registry_get_builtin_style(
         handle: *mut c_void,
         index: usize,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_builtin_transform_registry_get_builtin_description(
         handle: *mut c_void,
         index: usize,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_config_io_proxy_create() -> *mut c_void;
     pub fn ocio_config_io_proxy_destroy(handle: *mut c_void);
-    pub fn ocio_config_io_proxy_set_config_data(handle: *mut c_void, data: *const i8) -> ();
-    pub fn ocio_config_io_proxy_get_config_data(handle: *mut c_void) -> *const i8;
+    pub fn ocio_config_io_proxy_set_config_data(handle: *mut c_void, data: *const c_char) -> ();
+    pub fn ocio_config_io_proxy_get_config_data(handle: *mut c_void) -> *const c_char;
     pub fn ocio_config_io_proxy_set_lut_data(
         handle: *mut c_void,
-        filepath: *const i8,
+        filepath: *const c_char,
         data: *const u8,
         len: usize,
-        fastHash: *const i8,
+        fastHash: *const c_char,
     ) -> bool;
     pub fn ocio_config_io_proxy_get_lut_data_size(
         handle: *mut c_void,
-        filepath: *const i8,
+        filepath: *const c_char,
     ) -> usize;
-    pub fn ocio_config_io_proxy_has_lut_data(handle: *mut c_void, filepath: *const i8) -> bool;
+    pub fn ocio_config_io_proxy_has_lut_data(handle: *mut c_void, filepath: *const c_char) -> bool;
     pub fn ocio_config_io_proxy_copy_lut_data(
         handle: *mut c_void,
-        filepath: *const i8,
+        filepath: *const c_char,
         data: *mut u8,
         len: usize,
     ) -> bool;
     pub fn ocio_config_io_proxy_get_fast_lut_file_hash(
         handle: *mut c_void,
-        filepath: *const i8,
-    ) -> *const i8;
+        filepath: *const c_char,
+    ) -> *const c_char;
 
     // --- Config ---
     pub fn ocio_config_raw() -> *mut c_void;
-    pub fn ocio_config_from_file(path: *const i8) -> *mut c_void;
+    pub fn ocio_config_from_file(path: *const c_char) -> *mut c_void;
     pub fn ocio_config_create_raw() -> *mut c_void;
-    pub fn ocio_config_create_from_file(path: *const i8) -> *mut c_void;
-    pub fn ocio_config_create_from_builtin_config(configName: *const i8) -> *mut c_void;
+    pub fn ocio_config_create_from_file(path: *const c_char) -> *mut c_void;
+    pub fn ocio_config_create_from_builtin_config(configName: *const c_char) -> *mut c_void;
     pub fn ocio_config_create_from_env() -> *mut c_void;
-    pub fn ocio_config_create_from_stream(text: *const i8) -> *mut c_void;
+    pub fn ocio_config_create_from_stream(text: *const c_char) -> *mut c_void;
     pub fn ocio_config_create_from_config_io_proxy(ciop: *mut c_void) -> *mut c_void;
     pub fn ocio_config_destroy(handle: *mut c_void);
     pub fn ocio_config_get_major_version(handle: *mut c_void) -> i32;
@@ -157,12 +157,12 @@ unsafe extern "C" {
     pub fn ocio_config_upgrade_to_latest_version(handle: *mut c_void) -> ();
     pub fn ocio_config_validate(handle: *mut c_void) -> ();
     pub fn ocio_config_get_name(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_config_set_name(handle: *mut c_void, name: *const i8) -> ();
-    pub fn ocio_config_get_family_separator(handle: *mut c_void) -> i8;
-    pub fn ocio_config_get_default_family_separator(handle: *mut c_void) -> i8;
-    pub fn ocio_config_set_family_separator(handle: *mut c_void, separator: i8) -> ();
+    pub fn ocio_config_set_name(handle: *mut c_void, name: *const c_char) -> ();
+    pub fn ocio_config_get_family_separator(handle: *mut c_void) -> c_char;
+    pub fn ocio_config_get_default_family_separator(handle: *mut c_void) -> c_char;
+    pub fn ocio_config_set_family_separator(handle: *mut c_void, separator: c_char) -> ();
     pub fn ocio_config_get_description(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_config_set_description(handle: *mut c_void, description: *const i8) -> ();
+    pub fn ocio_config_set_description(handle: *mut c_void, description: *const c_char) -> ();
     pub fn ocio_config_serialize(handle: *mut c_void, os: *mut c_void) -> ();
     pub fn ocio_config_serialize_to_string(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_get_cache_id(handle: *mut c_void) -> *mut c_void;
@@ -170,8 +170,8 @@ unsafe extern "C" {
     pub fn ocio_config_get_current_context(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_add_environment_var(
         handle: *mut c_void,
-        name: *const i8,
-        defaultValue: *const i8,
+        name: *const c_char,
+        defaultValue: *const c_char,
     ) -> ();
     pub fn ocio_config_get_num_environment_vars(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_environment_var_name_by_index(
@@ -180,21 +180,21 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_config_get_environment_var_default(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_clear_environment_vars(handle: *mut c_void) -> ();
     pub fn ocio_config_set_environment_mode(handle: *mut c_void, mode: i32) -> ();
     pub fn ocio_config_get_environment_mode(handle: *mut c_void) -> i32;
     pub fn ocio_config_load_environment(handle: *mut c_void) -> ();
     pub fn ocio_config_get_search_path(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_config_set_search_path(handle: *mut c_void, path: *const i8) -> ();
+    pub fn ocio_config_set_search_path(handle: *mut c_void, path: *const c_char) -> ();
     pub fn ocio_config_get_num_search_paths(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_search_path_by_index(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_config_clear_search_paths(handle: *mut c_void) -> ();
-    pub fn ocio_config_add_search_path(handle: *mut c_void, path: *const i8) -> ();
+    pub fn ocio_config_add_search_path(handle: *mut c_void, path: *const c_char) -> ();
     pub fn ocio_config_get_working_dir(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_config_set_working_dir(handle: *mut c_void, dirname: *const i8) -> ();
-    pub fn ocio_config_get_color_spaces(handle: *mut c_void, category: *const i8) -> *mut c_void;
+    pub fn ocio_config_set_working_dir(handle: *mut c_void, dirname: *const c_char) -> ();
+    pub fn ocio_config_get_color_spaces(handle: *mut c_void, category: *const c_char) -> *mut c_void;
     pub fn ocio_config_get_num_color_spaces(
         handle: *mut c_void,
         searchReferenceType: i32,
@@ -211,51 +211,51 @@ unsafe extern "C" {
         handle: *mut c_void,
         index: i32,
     ) -> *mut c_void;
-    pub fn ocio_config_get_index_for_color_space(handle: *mut c_void, name: *const i8) -> i32;
-    pub fn ocio_config_get_color_space(handle: *mut c_void, name: *const i8) -> *mut c_void;
-    pub fn ocio_config_get_canonical_name(handle: *mut c_void, name: *const i8) -> *mut c_void;
+    pub fn ocio_config_get_index_for_color_space(handle: *mut c_void, name: *const c_char) -> i32;
+    pub fn ocio_config_get_color_space(handle: *mut c_void, name: *const c_char) -> *mut c_void;
+    pub fn ocio_config_get_canonical_name(handle: *mut c_void, name: *const c_char) -> *mut c_void;
     pub fn ocio_config_add_color_space(handle: *mut c_void, cs: *mut c_void) -> ();
-    pub fn ocio_config_remove_color_space(handle: *mut c_void, name: *const i8) -> ();
-    pub fn ocio_config_is_color_space_used(handle: *mut c_void, name: *const i8) -> bool;
+    pub fn ocio_config_remove_color_space(handle: *mut c_void, name: *const c_char) -> ();
+    pub fn ocio_config_is_color_space_used(handle: *mut c_void, name: *const c_char) -> bool;
     pub fn ocio_config_clear_color_spaces(handle: *mut c_void) -> ();
     pub fn ocio_config_set_inactive_color_spaces(
         handle: *mut c_void,
-        inactiveColorSpaces: *const i8,
+        inactiveColorSpaces: *const c_char,
     ) -> ();
     pub fn ocio_config_get_inactive_color_spaces(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_config_is_inactive_color_space(handle: *mut c_void, colorspace: *const i8) -> bool;
+    pub fn ocio_config_is_inactive_color_space(handle: *mut c_void, colorspace: *const c_char) -> bool;
     pub fn ocio_config_is_color_space_linear(
         handle: *mut c_void,
-        colorSpace: *const i8,
+        colorSpace: *const c_char,
         referenceSpaceType: i32,
     ) -> bool;
     pub fn ocio_config_identify_builtin_color_space(
         handle: *mut c_void,
         srcConfig: *mut c_void,
         builtinConfig: *mut c_void,
-        builtinColorSpaceName: *const i8,
+        builtinColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_identify_interchange_space(
         handle: *mut c_void,
         srcInterchangeName: *mut c_void,
         builtinInterchangeName: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
         builtinConfig: *mut c_void,
-        builtinColorSpaceName: *const i8,
+        builtinColorSpaceName: *const c_char,
     ) -> ();
     pub fn ocio_config_set_role(
         handle: *mut c_void,
-        role: *const i8,
-        colorSpaceName: *const i8,
+        role: *const c_char,
+        colorSpaceName: *const c_char,
     ) -> ();
     pub fn ocio_config_get_num_roles(handle: *mut c_void) -> i32;
-    pub fn ocio_config_has_role(handle: *mut c_void, role: *const i8) -> bool;
+    pub fn ocio_config_has_role(handle: *mut c_void, role: *const c_char) -> bool;
     pub fn ocio_config_get_role_name(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_config_get_role_color_space(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_config_get_role_color_space_v1(
         handle: *mut c_void,
-        roleName: *const i8,
+        roleName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_role_color_space_by_index(
         handle: *mut c_void,
@@ -263,126 +263,126 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_config_get_role_color_space_by_name(
         handle: *mut c_void,
-        roleName: *const i8,
+        roleName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_is_view_shared(
         handle: *mut c_void,
-        dispName: *const i8,
-        viewName: *const i8,
+        dispName: *const c_char,
+        viewName: *const c_char,
     ) -> bool;
     pub fn ocio_config_add_shared_view(
         handle: *mut c_void,
-        view: *const i8,
-        viewTransformName: *const i8,
-        colorSpaceName: *const i8,
-        looks: *const i8,
-        ruleName: *const i8,
-        description: *const i8,
+        view: *const c_char,
+        viewTransformName: *const c_char,
+        colorSpaceName: *const c_char,
+        looks: *const c_char,
+        ruleName: *const c_char,
+        description: *const c_char,
     ) -> ();
-    pub fn ocio_config_remove_shared_view(handle: *mut c_void, view: *const i8) -> ();
+    pub fn ocio_config_remove_shared_view(handle: *mut c_void, view: *const c_char) -> ();
     pub fn ocio_config_clear_shared_views(handle: *mut c_void) -> ();
     pub fn ocio_config_get_default_display(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_get_num_displays(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_display(handle: *mut c_void, index: i32) -> *mut c_void;
-    pub fn ocio_config_get_default_view(handle: *mut c_void, display: *const i8) -> *mut c_void;
+    pub fn ocio_config_get_default_view(handle: *mut c_void, display: *const c_char) -> *mut c_void;
     pub fn ocio_config_get_default_view_v1(
         handle: *mut c_void,
-        display: *const i8,
-        colorspaceName: *const i8,
+        display: *const c_char,
+        colorspaceName: *const c_char,
     ) -> *mut c_void;
-    pub fn ocio_config_get_num_views(handle: *mut c_void, display: *const i8) -> i32;
-    pub fn ocio_config_get_view(handle: *mut c_void, display: *const i8, index: i32)
+    pub fn ocio_config_get_num_views(handle: *mut c_void, display: *const c_char) -> i32;
+    pub fn ocio_config_get_view(handle: *mut c_void, display: *const c_char, index: i32)
         -> *mut c_void;
     pub fn ocio_config_get_num_views_v1(
         handle: *mut c_void,
-        display: *const i8,
-        colorspaceName: *const i8,
+        display: *const c_char,
+        colorspaceName: *const c_char,
     ) -> i32;
     pub fn ocio_config_get_view_v1(
         handle: *mut c_void,
-        display: *const i8,
-        colorspaceName: *const i8,
+        display: *const c_char,
+        colorspaceName: *const c_char,
         index: i32,
     ) -> *mut c_void;
     pub fn ocio_config_are_views_equal(
         handle: *mut c_void,
         first: *mut c_void,
         second: *mut c_void,
-        dispName: *const i8,
-        viewName: *const i8,
+        dispName: *const c_char,
+        viewName: *const c_char,
     ) -> bool;
     pub fn ocio_config_get_display_view_transform_name(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_display_view_color_space_name(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_display_view_looks(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_display_view_rule(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_display_view_description(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_has_view(
         handle: *mut c_void,
-        dispName: *const i8,
-        viewName: *const i8,
+        dispName: *const c_char,
+        viewName: *const c_char,
     ) -> bool;
     pub fn ocio_config_add_display_view_v1(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
-        colorSpaceName: *const i8,
-        looks: *const i8,
+        display: *const c_char,
+        view: *const c_char,
+        colorSpaceName: *const c_char,
+        looks: *const c_char,
     ) -> ();
     pub fn ocio_config_add_display_view_v2(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
-        viewTransformName: *const i8,
-        colorSpaceName: *const i8,
-        looks: *const i8,
-        ruleName: *const i8,
-        description: *const i8,
+        display: *const c_char,
+        view: *const c_char,
+        viewTransformName: *const c_char,
+        colorSpaceName: *const c_char,
+        looks: *const c_char,
+        ruleName: *const c_char,
+        description: *const c_char,
     ) -> ();
     pub fn ocio_config_add_display_shared_view(
         handle: *mut c_void,
-        display: *const i8,
-        sharedView: *const i8,
+        display: *const c_char,
+        sharedView: *const c_char,
     ) -> ();
     pub fn ocio_config_remove_display_view(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> ();
     pub fn ocio_config_clear_displays(handle: *mut c_void) -> ();
-    pub fn ocio_config_has_virtual_view(handle: *mut c_void, viewName: *const i8) -> bool;
-    pub fn ocio_config_is_virtual_view_shared(handle: *mut c_void, viewName: *const i8) -> bool;
+    pub fn ocio_config_has_virtual_view(handle: *mut c_void, viewName: *const c_char) -> bool;
+    pub fn ocio_config_is_virtual_view_shared(handle: *mut c_void, viewName: *const c_char) -> bool;
     pub fn ocio_config_add_virtual_display_view(
         handle: *mut c_void,
-        view: *const i8,
-        viewTransformName: *const i8,
-        colorSpaceName: *const i8,
-        looks: *const i8,
-        ruleName: *const i8,
-        description: *const i8,
+        view: *const c_char,
+        viewTransformName: *const c_char,
+        colorSpaceName: *const c_char,
+        looks: *const c_char,
+        ruleName: *const c_char,
+        description: *const c_char,
     ) -> ();
     pub fn ocio_config_add_virtual_display_shared_view(
         handle: *mut c_void,
-        sharedView: *const i8,
+        sharedView: *const c_char,
     ) -> ();
     pub fn ocio_config_get_virtual_display_num_views(handle: *mut c_void, type_param: i32) -> i32;
     pub fn ocio_config_get_virtual_display_view(
@@ -394,51 +394,51 @@ unsafe extern "C" {
         handle: *mut c_void,
         first: *mut c_void,
         second: *mut c_void,
-        viewName: *const i8,
+        viewName: *const c_char,
     ) -> bool;
     pub fn ocio_config_get_virtual_display_view_transform_name(
         handle: *mut c_void,
-        view: *const i8,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_virtual_display_view_color_space_name(
         handle: *mut c_void,
-        view: *const i8,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_virtual_display_view_looks(
         handle: *mut c_void,
-        view: *const i8,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_virtual_display_view_rule(
         handle: *mut c_void,
-        view: *const i8,
+        view: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_virtual_display_view_description(
         handle: *mut c_void,
-        view: *const i8,
+        view: *const c_char,
     ) -> *mut c_void;
-    pub fn ocio_config_remove_virtual_display_view(handle: *mut c_void, view: *const i8) -> ();
+    pub fn ocio_config_remove_virtual_display_view(handle: *mut c_void, view: *const c_char) -> ();
     pub fn ocio_config_clear_virtual_display(handle: *mut c_void) -> ();
     pub fn ocio_config_instantiate_display_from_monitor_name(
         handle: *mut c_void,
-        monitorName: *const i8,
+        monitorName: *const c_char,
     ) -> i32;
     pub fn ocio_config_instantiate_display_from_icc_profile(
         handle: *mut c_void,
-        ICCProfileFilepath: *const i8,
+        ICCProfileFilepath: *const c_char,
     ) -> i32;
-    pub fn ocio_config_set_active_displays(handle: *mut c_void, displays: *const i8) -> ();
+    pub fn ocio_config_set_active_displays(handle: *mut c_void, displays: *const c_char) -> ();
     pub fn ocio_config_get_active_displays(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_get_num_active_displays(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_active_display(handle: *mut c_void, index: i32) -> *mut c_void;
-    pub fn ocio_config_add_active_display(handle: *mut c_void, display: *const i8) -> ();
-    pub fn ocio_config_remove_active_display(handle: *mut c_void, display: *const i8) -> ();
+    pub fn ocio_config_add_active_display(handle: *mut c_void, display: *const c_char) -> ();
+    pub fn ocio_config_remove_active_display(handle: *mut c_void, display: *const c_char) -> ();
     pub fn ocio_config_clear_active_displays(handle: *mut c_void) -> ();
-    pub fn ocio_config_set_active_views(handle: *mut c_void, views: *const i8) -> ();
+    pub fn ocio_config_set_active_views(handle: *mut c_void, views: *const c_char) -> ();
     pub fn ocio_config_get_active_views(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_get_num_active_views(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_active_view(handle: *mut c_void, index: i32) -> *mut c_void;
-    pub fn ocio_config_add_active_view(handle: *mut c_void, view: *const i8) -> ();
-    pub fn ocio_config_remove_active_view(handle: *mut c_void, view: *const i8) -> ();
+    pub fn ocio_config_add_active_view(handle: *mut c_void, view: *const c_char) -> ();
+    pub fn ocio_config_remove_active_view(handle: *mut c_void, view: *const c_char) -> ();
     pub fn ocio_config_clear_active_views(handle: *mut c_void) -> ();
     pub fn ocio_config_get_num_displays_all(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_display_all(handle: *mut c_void, index: i32) -> *mut c_void;
@@ -452,25 +452,25 @@ unsafe extern "C" {
     pub fn ocio_config_get_num_views_v2(
         handle: *mut c_void,
         type_param: i32,
-        display: *const i8,
+        display: *const c_char,
     ) -> i32;
     pub fn ocio_config_get_view_v2(
         handle: *mut c_void,
         type_param: i32,
-        display: *const i8,
+        display: *const c_char,
         index: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_viewing_rules(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_set_viewing_rules(handle: *mut c_void, viewingRules: *mut c_void) -> ();
     pub fn ocio_config_get_default_luma_coefs(handle: *mut c_void, rgb: *mut c_void) -> ();
     pub fn ocio_config_set_default_luma_coefs(handle: *mut c_void, rgb: *mut c_void) -> ();
-    pub fn ocio_config_get_look(handle: *mut c_void, name: *const i8) -> *mut c_void;
+    pub fn ocio_config_get_look(handle: *mut c_void, name: *const c_char) -> *mut c_void;
     pub fn ocio_config_get_num_looks(handle: *mut c_void) -> i32;
     pub fn ocio_config_get_look_name_by_index(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_config_add_look(handle: *mut c_void, look: *mut c_void) -> ();
     pub fn ocio_config_clear_looks(handle: *mut c_void) -> ();
     pub fn ocio_config_get_num_view_transforms(handle: *mut c_void) -> i32;
-    pub fn ocio_config_get_view_transform(handle: *mut c_void, name: *const i8) -> *mut c_void;
+    pub fn ocio_config_get_view_transform(handle: *mut c_void, name: *const c_char) -> *mut c_void;
     pub fn ocio_config_get_view_transform_name_by_index(handle: *mut c_void, i: i32)
         -> *mut c_void;
     pub fn ocio_config_add_view_transform(handle: *mut c_void, viewTransform: *mut c_void) -> ();
@@ -480,7 +480,7 @@ unsafe extern "C" {
     pub fn ocio_config_get_default_view_transform_name(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_set_default_view_transform_name(
         handle: *mut c_void,
-        defaultName: *const i8,
+        defaultName: *const c_char,
     ) -> ();
     pub fn ocio_config_clear_view_transforms(handle: *mut c_void) -> ();
     pub fn ocio_config_get_num_named_transforms(handle: *mut c_void, visibility: i32) -> i32;
@@ -494,34 +494,34 @@ unsafe extern "C" {
         handle: *mut c_void,
         index: i32,
     ) -> *mut c_void;
-    pub fn ocio_config_get_index_for_named_transform(handle: *mut c_void, name: *const i8) -> i32;
-    pub fn ocio_config_get_named_transform(handle: *mut c_void, name: *const i8) -> *mut c_void;
+    pub fn ocio_config_get_index_for_named_transform(handle: *mut c_void, name: *const c_char) -> i32;
+    pub fn ocio_config_get_named_transform(handle: *mut c_void, name: *const c_char) -> *mut c_void;
     pub fn ocio_config_add_named_transform(handle: *mut c_void, namedTransform: *mut c_void) -> ();
-    pub fn ocio_config_remove_named_transform(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_config_remove_named_transform(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_config_clear_named_transforms(handle: *mut c_void) -> ();
     pub fn ocio_config_get_file_rules(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_config_set_file_rules(handle: *mut c_void, fileRules: *mut c_void) -> ();
     pub fn ocio_config_get_color_space_from_filepath(
         handle: *mut c_void,
-        filePath: *const i8,
+        filePath: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_color_space_from_filepath_by_ref_type(
         handle: *mut c_void,
-        filePath: *const i8,
+        filePath: *const c_char,
         ruleIndex: *mut c_void,
     ) -> *mut c_void;
     pub fn ocio_config_get_color_space_from_filepath_with_rule_index(
         handle: *mut c_void,
-        filePath: *const i8,
+        filePath: *const c_char,
         ruleIndex: *mut usize,
     ) -> *mut c_void;
     pub fn ocio_config_filepath_only_matches_default_rule(
         handle: *mut c_void,
-        filePath: *const i8,
+        filePath: *const c_char,
     ) -> bool;
     pub fn ocio_config_parse_color_space_from_string(
         handle: *mut c_void,
-        str: *const i8,
+        str: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_is_strict_parsing_enabled(handle: *mut c_void) -> bool;
     pub fn ocio_config_set_strict_parsing_enabled(handle: *mut c_void, enabled: bool) -> ();
@@ -538,28 +538,28 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v2(
         handle: *mut c_void,
-        srcColorSpaceName: *const i8,
-        dstColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
+        dstColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v3(
         handle: *mut c_void,
         context: *mut c_void,
-        srcColorSpaceName: *const i8,
-        dstColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
+        dstColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v4(
         handle: *mut c_void,
-        srcColorSpaceName: *const i8,
-        display: *const i8,
-        view: *const i8,
+        srcColorSpaceName: *const c_char,
+        display: *const c_char,
+        view: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v5(
         handle: *mut c_void,
         context: *mut c_void,
-        srcColorSpaceName: *const i8,
-        display: *const i8,
-        view: *const i8,
+        srcColorSpaceName: *const c_char,
+        display: *const c_char,
+        view: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v6(
@@ -575,13 +575,13 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v8(
         handle: *mut c_void,
-        namedTransformName: *const i8,
+        namedTransformName: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v9(
         handle: *mut c_void,
         context: *mut c_void,
-        namedTransformName: *const i8,
+        namedTransformName: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_v10(
@@ -602,93 +602,93 @@ unsafe extern "C" {
     pub fn ocio_config_get_processor_to_builtin_color_space(
         handle: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
-        builtinColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
+        builtinColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_builtin_color_space(
         handle: *mut c_void,
-        builtinColorSpaceName: *const i8,
+        builtinColorSpaceName: *const c_char,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs(
         handle: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
         dstConfig: *mut c_void,
-        dstColorSpaceName: *const i8,
+        dstColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v1(
         handle: *mut c_void,
         srcContext: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
         dstContext: *mut c_void,
         dstConfig: *mut c_void,
-        dstColorSpaceName: *const i8,
+        dstColorSpaceName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v2(
         handle: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
-        srcInterchangeName: *const i8,
+        srcColorSpaceName: *const c_char,
+        srcInterchangeName: *const c_char,
         dstConfig: *mut c_void,
-        dstColorSpaceName: *const i8,
-        dstInterchangeName: *const i8,
+        dstColorSpaceName: *const c_char,
+        dstInterchangeName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v3(
         handle: *mut c_void,
         srcContext: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
-        srcInterchangeName: *const i8,
+        srcColorSpaceName: *const c_char,
+        srcInterchangeName: *const c_char,
         dstContext: *mut c_void,
         dstConfig: *mut c_void,
-        dstColorSpaceName: *const i8,
-        dstInterchangeName: *const i8,
+        dstColorSpaceName: *const c_char,
+        dstInterchangeName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v4(
         handle: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
         dstConfig: *mut c_void,
-        dstDisplay: *const i8,
-        dstView: *const i8,
+        dstDisplay: *const c_char,
+        dstView: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v5(
         handle: *mut c_void,
         srcContext: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
+        srcColorSpaceName: *const c_char,
         dstContext: *mut c_void,
         dstConfig: *mut c_void,
-        dstDisplay: *const i8,
-        dstView: *const i8,
+        dstDisplay: *const c_char,
+        dstView: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v6(
         handle: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
-        srcInterchangeName: *const i8,
+        srcColorSpaceName: *const c_char,
+        srcInterchangeName: *const c_char,
         dstConfig: *mut c_void,
-        dstDisplay: *const i8,
-        dstView: *const i8,
-        dstInterchangeName: *const i8,
+        dstDisplay: *const c_char,
+        dstView: *const c_char,
+        dstInterchangeName: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_from_configs_v7(
         handle: *mut c_void,
         srcContext: *mut c_void,
         srcConfig: *mut c_void,
-        srcColorSpaceName: *const i8,
-        srcInterchangeName: *const i8,
+        srcColorSpaceName: *const c_char,
+        srcInterchangeName: *const c_char,
         dstContext: *mut c_void,
         dstConfig: *mut c_void,
-        dstDisplay: *const i8,
-        dstView: *const i8,
-        dstInterchangeName: *const i8,
+        dstDisplay: *const c_char,
+        dstView: *const c_char,
+        dstInterchangeName: *const c_char,
         direction: i32,
     ) -> *mut c_void;
     pub fn ocio_config_get_processor_cache_flags(handle: *mut c_void) -> i32;
@@ -704,28 +704,28 @@ unsafe extern "C" {
     pub fn ocio_file_rules_create() -> *mut c_void;
     pub fn ocio_file_rules_destroy(handle: *mut c_void);
     pub fn ocio_file_rules_get_num_entries(handle: *mut c_void) -> usize;
-    pub fn ocio_file_rules_get_index_for_rule(handle: *mut c_void, ruleName: *const i8) -> usize;
+    pub fn ocio_file_rules_get_index_for_rule(handle: *mut c_void, ruleName: *const c_char) -> usize;
     pub fn ocio_file_rules_get_name(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
     pub fn ocio_file_rules_get_pattern(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
     pub fn ocio_file_rules_set_pattern(
         handle: *mut c_void,
         ruleIndex: usize,
-        pattern: *const i8,
+        pattern: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_get_extension(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
     pub fn ocio_file_rules_set_extension(
         handle: *mut c_void,
         ruleIndex: usize,
-        extension: *const i8,
+        extension: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_get_regex(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
-    pub fn ocio_file_rules_set_regex(handle: *mut c_void, ruleIndex: usize, regex: *const i8)
+    pub fn ocio_file_rules_set_regex(handle: *mut c_void, ruleIndex: usize, regex: *const c_char)
         -> ();
     pub fn ocio_file_rules_get_color_space(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
     pub fn ocio_file_rules_set_color_space(
         handle: *mut c_void,
         ruleIndex: usize,
-        colorSpace: *const i8,
+        colorSpace: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_get_num_custom_keys(handle: *mut c_void, ruleIndex: usize) -> usize;
     pub fn ocio_file_rules_get_custom_key_name(
@@ -741,28 +741,28 @@ unsafe extern "C" {
     pub fn ocio_file_rules_set_custom_key(
         handle: *mut c_void,
         ruleIndex: usize,
-        key: *const i8,
-        value: *const i8,
+        key: *const c_char,
+        value: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_insert_rule(
         handle: *mut c_void,
         ruleIndex: usize,
-        name: *const i8,
-        colorSpace: *const i8,
-        pattern: *const i8,
-        extension: *const i8,
+        name: *const c_char,
+        colorSpace: *const c_char,
+        pattern: *const c_char,
+        extension: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_insert_rule_v1(
         handle: *mut c_void,
         ruleIndex: usize,
-        name: *const i8,
-        colorSpace: *const i8,
-        regex: *const i8,
+        name: *const c_char,
+        colorSpace: *const c_char,
+        regex: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_insert_path_search_rule(handle: *mut c_void, ruleIndex: usize) -> ();
     pub fn ocio_file_rules_set_default_rule_color_space(
         handle: *mut c_void,
-        colorSpace: *const i8,
+        colorSpace: *const c_char,
     ) -> ();
     pub fn ocio_file_rules_remove_rule(handle: *mut c_void, ruleIndex: usize) -> ();
     pub fn ocio_file_rules_increase_rule_priority(handle: *mut c_void, ruleIndex: usize) -> ();
@@ -774,7 +774,7 @@ unsafe extern "C" {
     pub fn ocio_viewing_rules_create_editable_copy(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_viewing_rules_destroy(handle: *mut c_void);
     pub fn ocio_viewing_rules_get_num_entries(handle: *mut c_void) -> usize;
-    pub fn ocio_viewing_rules_get_index_for_rule(handle: *mut c_void, ruleName: *const i8)
+    pub fn ocio_viewing_rules_get_index_for_rule(handle: *mut c_void, ruleName: *const c_char)
         -> usize;
     pub fn ocio_viewing_rules_get_name(handle: *mut c_void, ruleIndex: usize) -> *mut c_void;
     pub fn ocio_viewing_rules_get_num_color_spaces(handle: *mut c_void, ruleIndex: usize) -> usize;
@@ -786,7 +786,7 @@ unsafe extern "C" {
     pub fn ocio_viewing_rules_add_color_space(
         handle: *mut c_void,
         ruleIndex: usize,
-        colorSpace: *const i8,
+        colorSpace: *const c_char,
     ) -> ();
     pub fn ocio_viewing_rules_remove_color_space(
         handle: *mut c_void,
@@ -802,7 +802,7 @@ unsafe extern "C" {
     pub fn ocio_viewing_rules_add_encoding(
         handle: *mut c_void,
         ruleIndex: usize,
-        encoding: *const i8,
+        encoding: *const c_char,
     ) -> ();
     pub fn ocio_viewing_rules_remove_encoding(
         handle: *mut c_void,
@@ -823,13 +823,13 @@ unsafe extern "C" {
     pub fn ocio_viewing_rules_set_custom_key(
         handle: *mut c_void,
         ruleIndex: usize,
-        key: *const i8,
-        value: *const i8,
+        key: *const c_char,
+        value: *const c_char,
     ) -> ();
     pub fn ocio_viewing_rules_insert_rule(
         handle: *mut c_void,
         ruleIndex: usize,
-        ruleName: *const i8,
+        ruleName: *const c_char,
     ) -> ();
     pub fn ocio_viewing_rules_remove_rule(handle: *mut c_void, ruleIndex: usize) -> ();
 
@@ -837,51 +837,51 @@ unsafe extern "C" {
     pub fn ocio_color_space_create() -> *mut c_void;
     pub fn ocio_color_space_destroy(handle: *mut c_void);
     pub fn ocio_color_space_get_name(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_name(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_color_space_set_name(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_color_space_get_num_aliases(handle: *mut c_void) -> usize;
     pub fn ocio_color_space_get_alias(handle: *mut c_void, idx: usize) -> *mut c_void;
-    pub fn ocio_color_space_has_alias(handle: *mut c_void, alias: *const i8) -> bool;
-    pub fn ocio_color_space_add_alias(handle: *mut c_void, alias: *const i8) -> ();
-    pub fn ocio_color_space_remove_alias(handle: *mut c_void, alias: *const i8) -> ();
+    pub fn ocio_color_space_has_alias(handle: *mut c_void, alias: *const c_char) -> bool;
+    pub fn ocio_color_space_add_alias(handle: *mut c_void, alias: *const c_char) -> ();
+    pub fn ocio_color_space_remove_alias(handle: *mut c_void, alias: *const c_char) -> ();
     pub fn ocio_color_space_clear_aliases(handle: *mut c_void) -> ();
     pub fn ocio_color_space_get_family(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_family(handle: *mut c_void, family: *const i8) -> ();
+    pub fn ocio_color_space_set_family(handle: *mut c_void, family: *const c_char) -> ();
     pub fn ocio_color_space_get_equality_group(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_equality_group(handle: *mut c_void, equalityGroup: *const i8)
+    pub fn ocio_color_space_set_equality_group(handle: *mut c_void, equalityGroup: *const c_char)
         -> ();
     pub fn ocio_color_space_get_description(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_description(handle: *mut c_void, description: *const i8) -> ();
+    pub fn ocio_color_space_set_description(handle: *mut c_void, description: *const c_char) -> ();
     pub fn ocio_color_space_get_interop_id(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_interop_id(handle: *mut c_void, interopID: *const i8) -> ();
+    pub fn ocio_color_space_set_interop_id(handle: *mut c_void, interopID: *const c_char) -> ();
     pub fn ocio_color_space_set_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-        value: *const i8,
+        attrName: *const c_char,
+        value: *const c_char,
     ) -> ();
     pub fn ocio_color_space_get_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-    ) -> *const i8;
+        attrName: *const c_char,
+    ) -> *const c_char;
     pub fn ocio_color_space_get_num_interchange_attributes(handle: *mut c_void) -> i32;
     pub fn ocio_color_space_get_interchange_attribute_name_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_color_space_get_interchange_attribute_value_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_color_space_get_bit_depth(handle: *mut c_void) -> i32;
     pub fn ocio_color_space_set_bit_depth(handle: *mut c_void, bitDepth: i32) -> ();
     pub fn ocio_color_space_get_reference_space_type(handle: *mut c_void) -> i32;
-    pub fn ocio_color_space_has_category(handle: *mut c_void, category: *const i8) -> bool;
-    pub fn ocio_color_space_add_category(handle: *mut c_void, category: *const i8) -> ();
-    pub fn ocio_color_space_remove_category(handle: *mut c_void, category: *const i8) -> ();
+    pub fn ocio_color_space_has_category(handle: *mut c_void, category: *const c_char) -> bool;
+    pub fn ocio_color_space_add_category(handle: *mut c_void, category: *const c_char) -> ();
+    pub fn ocio_color_space_remove_category(handle: *mut c_void, category: *const c_char) -> ();
     pub fn ocio_color_space_get_num_categories(handle: *mut c_void) -> i32;
     pub fn ocio_color_space_get_category(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_color_space_clear_categories(handle: *mut c_void) -> ();
     pub fn ocio_color_space_get_encoding(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_set_encoding(handle: *mut c_void, encoding: *const i8) -> ();
+    pub fn ocio_color_space_set_encoding(handle: *mut c_void, encoding: *const c_char) -> ();
     pub fn ocio_color_space_is_data(handle: *mut c_void) -> bool;
     pub fn ocio_color_space_set_is_data(handle: *mut c_void, isData: bool) -> ();
     pub fn ocio_color_space_get_allocation(handle: *mut c_void) -> i32;
@@ -914,13 +914,13 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub fn ocio_color_space_set_get_color_space(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
     ) -> *mut c_void;
-    pub fn ocio_color_space_set_get_color_space_index(handle: *mut c_void, name: *const i8) -> i32;
-    pub fn ocio_color_space_set_has_color_space(handle: *mut c_void, name: *const i8) -> bool;
+    pub fn ocio_color_space_set_get_color_space_index(handle: *mut c_void, name: *const c_char) -> i32;
+    pub fn ocio_color_space_set_has_color_space(handle: *mut c_void, name: *const c_char) -> bool;
     pub fn ocio_color_space_set_add_color_space(handle: *mut c_void, cs: *mut c_void) -> ();
     pub fn ocio_color_space_set_add_color_spaces(handle: *mut c_void, cs: *mut c_void) -> ();
-    pub fn ocio_color_space_set_remove_color_space(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_color_space_set_remove_color_space(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_color_space_set_remove_color_spaces(handle: *mut c_void, cs: *mut c_void) -> ();
     pub fn ocio_color_space_set_clear_color_spaces(handle: *mut c_void) -> ();
 
@@ -928,57 +928,57 @@ unsafe extern "C" {
     pub fn ocio_look_create() -> *mut c_void;
     pub fn ocio_look_destroy(handle: *mut c_void);
     pub fn ocio_look_get_name(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_set_name(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_look_set_name(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_look_get_process_space(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_set_process_space(handle: *mut c_void, processSpace: *const i8) -> ();
+    pub fn ocio_look_set_process_space(handle: *mut c_void, processSpace: *const c_char) -> ();
     pub fn ocio_look_get_transform(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_look_set_transform(handle: *mut c_void, transform: *mut c_void) -> ();
     pub fn ocio_look_get_inverse_transform(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_look_set_inverse_transform(handle: *mut c_void, transform: *mut c_void) -> ();
     pub fn ocio_look_get_description(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_set_description(handle: *mut c_void, description: *const i8) -> ();
+    pub fn ocio_look_set_description(handle: *mut c_void, description: *const c_char) -> ();
     pub fn ocio_look_set_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-        value: *const i8,
+        attrName: *const c_char,
+        value: *const c_char,
     ) -> ();
     pub fn ocio_look_get_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-    ) -> *const i8;
+        attrName: *const c_char,
+    ) -> *const c_char;
     pub fn ocio_look_get_num_interchange_attributes(handle: *mut c_void) -> i32;
     pub fn ocio_look_get_interchange_attribute_name_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_look_get_interchange_attribute_value_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
 
     // --- NamedTransform ---
     pub fn ocio_named_transform_create() -> *mut c_void;
     pub fn ocio_named_transform_destroy(handle: *mut c_void);
     pub fn ocio_named_transform_get_name(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_named_transform_set_name(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_named_transform_set_name(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_named_transform_get_num_aliases(handle: *mut c_void) -> usize;
     pub fn ocio_named_transform_get_alias(handle: *mut c_void, idx: usize) -> *mut c_void;
-    pub fn ocio_named_transform_has_alias(handle: *mut c_void, alias: *const i8) -> bool;
-    pub fn ocio_named_transform_add_alias(handle: *mut c_void, alias: *const i8) -> ();
-    pub fn ocio_named_transform_remove_alias(handle: *mut c_void, alias: *const i8) -> ();
+    pub fn ocio_named_transform_has_alias(handle: *mut c_void, alias: *const c_char) -> bool;
+    pub fn ocio_named_transform_add_alias(handle: *mut c_void, alias: *const c_char) -> ();
+    pub fn ocio_named_transform_remove_alias(handle: *mut c_void, alias: *const c_char) -> ();
     pub fn ocio_named_transform_clear_aliases(handle: *mut c_void) -> ();
     pub fn ocio_named_transform_get_family(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_named_transform_set_family(handle: *mut c_void, family: *const i8) -> ();
+    pub fn ocio_named_transform_set_family(handle: *mut c_void, family: *const c_char) -> ();
     pub fn ocio_named_transform_get_description(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_named_transform_set_description(handle: *mut c_void, description: *const i8) -> ();
-    pub fn ocio_named_transform_has_category(handle: *mut c_void, category: *const i8) -> bool;
-    pub fn ocio_named_transform_add_category(handle: *mut c_void, category: *const i8) -> ();
-    pub fn ocio_named_transform_remove_category(handle: *mut c_void, category: *const i8) -> ();
+    pub fn ocio_named_transform_set_description(handle: *mut c_void, description: *const c_char) -> ();
+    pub fn ocio_named_transform_has_category(handle: *mut c_void, category: *const c_char) -> bool;
+    pub fn ocio_named_transform_add_category(handle: *mut c_void, category: *const c_char) -> ();
+    pub fn ocio_named_transform_remove_category(handle: *mut c_void, category: *const c_char) -> ();
     pub fn ocio_named_transform_get_num_categories(handle: *mut c_void) -> i32;
     pub fn ocio_named_transform_get_category(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_named_transform_clear_categories(handle: *mut c_void) -> ();
     pub fn ocio_named_transform_get_encoding(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_named_transform_set_encoding(handle: *mut c_void, encoding: *const i8) -> ();
+    pub fn ocio_named_transform_set_encoding(handle: *mut c_void, encoding: *const c_char) -> ();
     pub fn ocio_named_transform_get_transform(handle: *mut c_void, dir: i32) -> *mut c_void;
     pub fn ocio_named_transform_set_transform(
         handle: *mut c_void,
@@ -992,32 +992,32 @@ unsafe extern "C" {
     pub fn ocio_view_transform_destroy(handle: *mut c_void);
     pub fn ocio_view_transform_create_editable_copy(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_view_transform_get_name(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_view_transform_set_name(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_view_transform_set_name(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_view_transform_get_family(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_view_transform_set_family(handle: *mut c_void, family: *const i8) -> ();
+    pub fn ocio_view_transform_set_family(handle: *mut c_void, family: *const c_char) -> ();
     pub fn ocio_view_transform_get_description(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_view_transform_set_description(handle: *mut c_void, description: *const i8) -> ();
+    pub fn ocio_view_transform_set_description(handle: *mut c_void, description: *const c_char) -> ();
     pub fn ocio_view_transform_set_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-        value: *const i8,
+        attrName: *const c_char,
+        value: *const c_char,
     ) -> ();
     pub fn ocio_view_transform_get_interchange_attribute(
         handle: *mut c_void,
-        attrName: *const i8,
-    ) -> *const i8;
+        attrName: *const c_char,
+    ) -> *const c_char;
     pub fn ocio_view_transform_get_num_interchange_attributes(handle: *mut c_void) -> i32;
     pub fn ocio_view_transform_get_interchange_attribute_name_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
     pub fn ocio_view_transform_get_interchange_attribute_value_by_index(
         handle: *mut c_void,
         index: i32,
-    ) -> *const i8;
-    pub fn ocio_view_transform_has_category(handle: *mut c_void, category: *const i8) -> bool;
-    pub fn ocio_view_transform_add_category(handle: *mut c_void, category: *const i8) -> ();
-    pub fn ocio_view_transform_remove_category(handle: *mut c_void, category: *const i8) -> ();
+    ) -> *const c_char;
+    pub fn ocio_view_transform_has_category(handle: *mut c_void, category: *const c_char) -> bool;
+    pub fn ocio_view_transform_add_category(handle: *mut c_void, category: *const c_char) -> ();
+    pub fn ocio_view_transform_remove_category(handle: *mut c_void, category: *const c_char) -> ();
     pub fn ocio_view_transform_get_num_categories(handle: *mut c_void) -> i32;
     pub fn ocio_view_transform_get_category(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_view_transform_clear_categories(handle: *mut c_void) -> ();
@@ -1085,8 +1085,8 @@ unsafe extern "C" {
     pub fn ocio_processor_metadata_get_file(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_processor_metadata_get_num_looks(handle: *mut c_void) -> i32;
     pub fn ocio_processor_metadata_get_look(handle: *mut c_void, index: i32) -> *mut c_void;
-    pub fn ocio_processor_metadata_add_file(handle: *mut c_void, fileName: *const i8) -> ();
-    pub fn ocio_processor_metadata_add_look(handle: *mut c_void, look: *const i8) -> ();
+    pub fn ocio_processor_metadata_add_file(handle: *mut c_void, fileName: *const c_char) -> ();
+    pub fn ocio_processor_metadata_add_look(handle: *mut c_void, look: *const c_char) -> ();
 
     // --- CPUProcessor ---
     pub fn ocio_cpu_processor_destroy(handle: *mut c_void);
@@ -1157,31 +1157,31 @@ unsafe extern "C" {
     pub fn ocio_gpu_shader_desc_get_uniform_buffer_size_bytes(handle: *mut c_void) -> usize;
     pub fn ocio_gpu_shader_desc_add_uniform_double(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
         value: f64,
     ) -> bool;
     pub fn ocio_gpu_shader_desc_add_uniform_bool(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
         value: bool,
     ) -> bool;
     pub fn ocio_gpu_shader_desc_add_uniform_float3(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
         x: f32,
         y: f32,
         z: f32,
     ) -> bool;
     pub fn ocio_gpu_shader_desc_add_uniform_vector_float(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
         values: *const f32,
         len: usize,
         max_size: u32,
     ) -> bool;
     pub fn ocio_gpu_shader_desc_add_uniform_vector_int(
         handle: *mut c_void,
-        name: *const i8,
+        name: *const c_char,
         values: *const i32,
         len: usize,
         max_size: u32,
@@ -1198,8 +1198,8 @@ unsafe extern "C" {
     pub fn ocio_gpu_shader_desc_has_dynamic_property(handle: *mut c_void, type_param: i32) -> bool;
     pub fn ocio_gpu_shader_desc_add_texture(
         handle: *mut c_void,
-        texture_name: *const i8,
-        sampler_name: *const i8,
+        texture_name: *const c_char,
+        sampler_name: *const c_char,
         width: u32,
         height: u32,
         channel: i32,
@@ -1223,8 +1223,8 @@ unsafe extern "C" {
     ) -> bool;
     pub fn ocio_gpu_shader_desc_add3d_texture(
         handle: *mut c_void,
-        texture_name: *const i8,
-        sampler_name: *const i8,
+        texture_name: *const c_char,
+        sampler_name: *const c_char,
         edge_len: u32,
         interpolation: i32,
         values: *const f32,
@@ -1255,8 +1255,8 @@ unsafe extern "C" {
     pub fn ocio_gpu_shader_desc_get_texture(
         handle: *mut c_void,
         index: *mut c_void,
-        textureName: *const i8,
-        samplerName: *const i8,
+        textureName: *const c_char,
+        samplerName: *const c_char,
         width: *mut c_void,
         height: *mut c_void,
         channel: *mut c_void,
@@ -1276,8 +1276,8 @@ unsafe extern "C" {
     pub fn ocio_gpu_shader_desc_get3d_texture(
         handle: *mut c_void,
         index: *mut c_void,
-        textureName: *const i8,
-        samplerName: *const i8,
+        textureName: *const c_char,
+        samplerName: *const c_char,
         edgelen: *mut c_void,
         interpolation: *mut c_void,
     ) -> ();
@@ -1298,23 +1298,23 @@ unsafe extern "C" {
     pub fn ocio_baker_get_config(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_baker_set_config(handle: *mut c_void, config: *mut c_void) -> ();
     pub fn ocio_baker_get_format(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_baker_set_format(handle: *mut c_void, formatName: *const i8) -> ();
+    pub fn ocio_baker_set_format(handle: *mut c_void, formatName: *const c_char) -> ();
     pub fn ocio_baker_get_format_metadata(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_baker_get_format_metadata_v1(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_baker_get_input_space(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_baker_set_input_space(handle: *mut c_void, inputSpace: *const i8) -> ();
+    pub fn ocio_baker_set_input_space(handle: *mut c_void, inputSpace: *const c_char) -> ();
     pub fn ocio_baker_get_shaper_space(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_baker_set_shaper_space(handle: *mut c_void, shaperSpace: *const i8) -> ();
+    pub fn ocio_baker_set_shaper_space(handle: *mut c_void, shaperSpace: *const c_char) -> ();
     pub fn ocio_baker_get_looks(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_baker_set_looks(handle: *mut c_void, looks: *const i8) -> ();
+    pub fn ocio_baker_set_looks(handle: *mut c_void, looks: *const c_char) -> ();
     pub fn ocio_baker_get_target_space(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_baker_set_target_space(handle: *mut c_void, targetSpace: *const i8) -> ();
+    pub fn ocio_baker_set_target_space(handle: *mut c_void, targetSpace: *const c_char) -> ();
     pub fn ocio_baker_get_display(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_baker_get_view(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_baker_set_display_view(
         handle: *mut c_void,
-        display: *const i8,
-        view: *const i8,
+        display: *const c_char,
+        view: *const c_char,
     ) -> ();
     pub fn ocio_baker_get_shaper_size(handle: *mut c_void) -> i32;
     pub fn ocio_baker_set_shaper_size(handle: *mut c_void, shapersize: i32) -> ();
@@ -1327,20 +1327,20 @@ unsafe extern "C" {
     pub fn ocio_context_create() -> *mut c_void;
     pub fn ocio_context_destroy(handle: *mut c_void);
     pub fn ocio_context_get_cache_id(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_context_set_search_path(handle: *mut c_void, path: *const i8) -> ();
+    pub fn ocio_context_set_search_path(handle: *mut c_void, path: *const c_char) -> ();
     pub fn ocio_context_get_search_path(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_context_get_num_search_paths(handle: *mut c_void) -> i32;
     pub fn ocio_context_get_search_path_by_index(handle: *mut c_void, index: i32) -> *mut c_void;
     pub fn ocio_context_clear_search_paths(handle: *mut c_void) -> ();
-    pub fn ocio_context_add_search_path(handle: *mut c_void, path: *const i8) -> ();
-    pub fn ocio_context_set_working_dir(handle: *mut c_void, dirname: *const i8) -> ();
+    pub fn ocio_context_add_search_path(handle: *mut c_void, path: *const c_char) -> ();
+    pub fn ocio_context_set_working_dir(handle: *mut c_void, dirname: *const c_char) -> ();
     pub fn ocio_context_get_working_dir(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_context_set_string_var(
         handle: *mut c_void,
-        name: *const i8,
-        value: *const i8,
+        name: *const c_char,
+        value: *const c_char,
     ) -> ();
-    pub fn ocio_context_get_string_var(handle: *mut c_void, name: *const i8) -> *mut c_void;
+    pub fn ocio_context_get_string_var(handle: *mut c_void, name: *const c_char) -> *mut c_void;
     pub fn ocio_context_get_num_string_vars(handle: *mut c_void) -> i32;
     pub fn ocio_context_get_string_var_name_by_index(
         handle: *mut c_void,
@@ -1352,19 +1352,19 @@ unsafe extern "C" {
     pub fn ocio_context_set_environment_mode(handle: *mut c_void, mode: i32) -> ();
     pub fn ocio_context_get_environment_mode(handle: *mut c_void) -> i32;
     pub fn ocio_context_load_environment(handle: *mut c_void) -> ();
-    pub fn ocio_context_resolve_string_var(handle: *mut c_void, string: *const i8) -> *mut c_void;
+    pub fn ocio_context_resolve_string_var(handle: *mut c_void, string: *const c_char) -> *mut c_void;
     pub fn ocio_context_resolve_string_var_v1(
         handle: *mut c_void,
-        string: *const i8,
+        string: *const c_char,
         usedContextVars: *mut c_void,
     ) -> *mut c_void;
     pub fn ocio_context_resolve_file_location(
         handle: *mut c_void,
-        filename: *const i8,
+        filename: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_context_resolve_file_location_v1(
         handle: *mut c_void,
-        filename: *const i8,
+        filename: *const c_char,
         usedContextVars: *mut c_void,
     ) -> *mut c_void;
     pub fn ocio_context_set_config_io_proxy(handle: *mut c_void, ciop: *mut c_void) -> ();
@@ -1391,14 +1391,14 @@ unsafe extern "C" {
     pub fn ocio_builtin_transform_create() -> *mut c_void;
     pub fn ocio_builtin_transform_destroy(handle: *mut c_void);
     pub fn ocio_builtin_transform_get_style(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_builtin_transform_set_style(handle: *mut c_void, style: *const i8) -> ();
+    pub fn ocio_builtin_transform_set_style(handle: *mut c_void, style: *const c_char) -> ();
     pub fn ocio_builtin_transform_get_description(handle: *mut c_void) -> *mut c_void;
 
     // --- CDLTransform ---
     pub fn ocio_cdl_transform_create() -> *mut c_void;
     pub fn ocio_cdl_transform_destroy(handle: *mut c_void);
-    pub fn ocio_cdl_transform_from_file(src: *const i8, cccId: *const i8) -> *mut c_void;
-    pub fn ocio_cdl_transform_create_group_from_file(src: *const i8) -> *mut c_void;
+    pub fn ocio_cdl_transform_from_file(src: *const c_char, cccId: *const c_char) -> *mut c_void;
+    pub fn ocio_cdl_transform_create_group_from_file(src: *const c_char) -> *mut c_void;
     pub fn ocio_cdl_transform_get_format_metadata(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_cdl_transform_get_format_metadata_v1(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_cdl_transform_get_format_metadata_v2(handle: *mut c_void) -> *mut c_void;
@@ -1417,11 +1417,11 @@ unsafe extern "C" {
     pub fn ocio_cdl_transform_set_sat(handle: *mut c_void, sat: f64) -> ();
     pub fn ocio_cdl_transform_get_sat_luma_coefs(handle: *mut c_void, rgb: *mut c_void) -> ();
     pub fn ocio_cdl_transform_get_id(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_cdl_transform_set_id(handle: *mut c_void, id: *const i8) -> ();
+    pub fn ocio_cdl_transform_set_id(handle: *mut c_void, id: *const c_char) -> ();
     pub fn ocio_cdl_transform_get_first_sop_description(handle: *mut c_void) -> *mut c_void;
     pub fn ocio_cdl_transform_set_first_sop_description(
         handle: *mut c_void,
-        description: *const i8,
+        description: *const c_char,
     ) -> ();
 
     // --- ColorSpaceTransform ---
@@ -1432,9 +1432,9 @@ unsafe extern "C" {
     pub fn ocio_color_space_transform_set_direction(handle: *mut c_void, dir: i32) -> ();
     pub fn ocio_color_space_transform_validate(handle: *mut c_void) -> ();
     pub fn ocio_color_space_transform_get_src(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_transform_set_src(handle: *mut c_void, src: *const i8) -> ();
+    pub fn ocio_color_space_transform_set_src(handle: *mut c_void, src: *const c_char) -> ();
     pub fn ocio_color_space_transform_get_dst(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_color_space_transform_set_dst(handle: *mut c_void, dst: *const i8) -> ();
+    pub fn ocio_color_space_transform_set_dst(handle: *mut c_void, dst: *const c_char) -> ();
     pub fn ocio_color_space_transform_get_data_bypass(handle: *mut c_void) -> bool;
     pub fn ocio_color_space_transform_set_data_bypass(handle: *mut c_void, enabled: bool) -> ();
 
@@ -1446,11 +1446,11 @@ unsafe extern "C" {
     pub fn ocio_display_view_transform_set_direction(handle: *mut c_void, dir: i32) -> ();
     pub fn ocio_display_view_transform_validate(handle: *mut c_void) -> ();
     pub fn ocio_display_view_transform_get_src(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_display_view_transform_set_src(handle: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_display_view_transform_set_src(handle: *mut c_void, name: *const c_char) -> ();
     pub fn ocio_display_view_transform_get_display(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_display_view_transform_set_display(handle: *mut c_void, display: *const i8) -> ();
+    pub fn ocio_display_view_transform_set_display(handle: *mut c_void, display: *const c_char) -> ();
     pub fn ocio_display_view_transform_get_view(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_display_view_transform_set_view(handle: *mut c_void, view: *const i8) -> ();
+    pub fn ocio_display_view_transform_set_view(handle: *mut c_void, view: *const c_char) -> ();
     pub fn ocio_display_view_transform_get_looks_bypass(handle: *mut c_void) -> bool;
     pub fn ocio_display_view_transform_set_looks_bypass(handle: *mut c_void, bypass: bool) -> ();
     pub fn ocio_display_view_transform_get_data_bypass(handle: *mut c_void) -> bool;
@@ -1539,17 +1539,17 @@ unsafe extern "C" {
     pub fn ocio_file_transform_set_direction(handle: *mut c_void, dir: i32) -> ();
     pub fn ocio_file_transform_validate(handle: *mut c_void) -> ();
     pub fn ocio_file_transform_get_src(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_file_transform_set_src(handle: *mut c_void, src: *const i8) -> ();
+    pub fn ocio_file_transform_set_src(handle: *mut c_void, src: *const c_char) -> ();
     pub fn ocio_file_transform_get_ccc_id(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_file_transform_set_ccc_id(handle: *mut c_void, id: *const i8) -> ();
+    pub fn ocio_file_transform_set_ccc_id(handle: *mut c_void, id: *const c_char) -> ();
     pub fn ocio_file_transform_get_cdl_style(handle: *mut c_void) -> i32;
     pub fn ocio_file_transform_set_cdl_style(handle: *mut c_void, arg0: i32) -> ();
     pub fn ocio_file_transform_get_interpolation(handle: *mut c_void) -> i32;
     pub fn ocio_file_transform_set_interpolation(handle: *mut c_void, interp: i32) -> ();
     pub fn ocio_file_transform_get_num_formats() -> i32;
-    pub fn ocio_file_transform_get_format_name_by_index(index: i32) -> *const i8;
-    pub fn ocio_file_transform_get_format_extension_by_index(index: i32) -> *const i8;
-    pub fn ocio_file_transform_is_format_extension_supported(extension: *const i8) -> bool;
+    pub fn ocio_file_transform_get_format_name_by_index(index: i32) -> *const c_char;
+    pub fn ocio_file_transform_get_format_extension_by_index(index: i32) -> *const c_char;
+    pub fn ocio_file_transform_is_format_extension_supported(extension: *const c_char) -> bool;
 
     // --- FixedFunctionTransform ---
     pub fn ocio_fixed_function_transform_create() -> *mut c_void;
@@ -1790,17 +1790,17 @@ unsafe extern "C" {
     pub fn ocio_group_transform_write(
         handle: *mut c_void,
         config: *mut c_void,
-        formatName: *const i8,
+        formatName: *const c_char,
         os: *mut c_void,
     ) -> ();
     pub fn ocio_group_transform_write_to_string(
         handle: *mut c_void,
         config: *mut c_void,
-        formatName: *const i8,
+        formatName: *const c_char,
     ) -> *mut c_void;
     pub fn ocio_group_transform_get_num_write_formats() -> i32;
-    pub fn ocio_group_transform_get_format_name_by_index(index: i32) -> *const i8;
-    pub fn ocio_group_transform_get_format_extension_by_index(index: i32) -> *const i8;
+    pub fn ocio_group_transform_get_format_name_by_index(index: i32) -> *const c_char;
+    pub fn ocio_group_transform_get_format_extension_by_index(index: i32) -> *const c_char;
 
     // --- LogAffineTransform ---
     pub fn ocio_log_affine_transform_create() -> *mut c_void;
@@ -1892,11 +1892,11 @@ unsafe extern "C" {
     pub fn ocio_look_transform_set_direction(handle: *mut c_void, dir: i32) -> ();
     pub fn ocio_look_transform_validate(handle: *mut c_void) -> ();
     pub fn ocio_look_transform_get_src(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_transform_set_src(handle: *mut c_void, src: *const i8) -> ();
+    pub fn ocio_look_transform_set_src(handle: *mut c_void, src: *const c_char) -> ();
     pub fn ocio_look_transform_get_dst(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_transform_set_dst(handle: *mut c_void, dst: *const i8) -> ();
+    pub fn ocio_look_transform_set_dst(handle: *mut c_void, dst: *const c_char) -> ();
     pub fn ocio_look_transform_get_looks(handle: *mut c_void) -> *mut c_void;
-    pub fn ocio_look_transform_set_looks(handle: *mut c_void, looks: *const i8) -> ();
+    pub fn ocio_look_transform_set_looks(handle: *mut c_void, looks: *const c_char) -> ();
     pub fn ocio_look_transform_get_skip_color_space_conversion(handle: *mut c_void) -> bool;
     pub fn ocio_look_transform_set_skip_color_space_conversion(
         handle: *mut c_void,
@@ -2038,9 +2038,9 @@ unsafe extern "C" {
 unsafe extern "C" {
     pub fn ocio_baker_create_editable_copy(baker: *mut c_void) -> *mut c_void;
 
-    pub fn ocio_baker_get_format_extension_by_index(index: i32) -> *const i8;
+    pub fn ocio_baker_get_format_extension_by_index(index: i32) -> *const c_char;
 
-    pub fn ocio_baker_get_format_name_by_index(index: i32) -> *const i8;
+    pub fn ocio_baker_get_format_name_by_index(index: i32) -> *const c_char;
 
     pub fn ocio_baker_get_num_formats() -> i32;
 
@@ -2048,13 +2048,13 @@ unsafe extern "C" {
 
     pub fn ocio_builtin_transform_get_num_styles() -> i32;
 
-    pub fn ocio_builtin_transform_get_style_by_index(index: i32) -> *const i8;
+    pub fn ocio_builtin_transform_get_style_by_index(index: i32) -> *const c_char;
 
-    pub fn ocio_builtin_transform_is_valid_style(style: *const i8) -> bool;
+    pub fn ocio_builtin_transform_is_valid_style(style: *const c_char) -> bool;
 
     pub fn ocio_builtin_transform_set_direction(transform: *mut c_void, direction: i32) -> ();
 
-    pub fn ocio_cdl_transform_create_from_file(src: *const i8, cccId: *const i8) -> *mut c_void;
+    pub fn ocio_cdl_transform_create_from_file(src: *const c_char, cccId: *const c_char) -> *mut c_void;
 
     pub fn ocio_cdl_transform_get_direction(transform: *mut c_void) -> i32;
 
@@ -2068,10 +2068,10 @@ unsafe extern "C" {
 
     pub fn ocio_config_add_display(
         config: *mut c_void,
-        display: *const i8,
-        view: *const i8,
-        transformName: *const i8,
-        rule: *const i8,
+        display: *const c_char,
+        view: *const c_char,
+        transformName: *const c_char,
+        rule: *const c_char,
     ) -> ();
 
     pub fn ocio_config_create_editable_copy(config: *mut c_void) -> *mut c_void;
@@ -2265,102 +2265,102 @@ unsafe extern "C" {
 
     pub fn ocio_format_metadata_add_attribute(
         metadata: *mut c_void,
-        name: *const i8,
-        value: *const i8,
+        name: *const c_char,
+        value: *const c_char,
     ) -> ();
 
     pub fn ocio_format_metadata_add_child_element(
         metadata: *mut c_void,
-        name: *const i8,
-        value: *const i8,
+        name: *const c_char,
+        value: *const c_char,
     ) -> ();
 
     pub fn ocio_format_metadata_clear(metadata: *mut c_void) -> ();
 
     pub fn ocio_format_metadata_destroy(handle: *mut c_void) -> ();
 
-    pub fn ocio_format_metadata_get_attribute_name(metadata: *mut c_void, i: i32) -> *const i8;
+    pub fn ocio_format_metadata_get_attribute_name(metadata: *mut c_void, i: i32) -> *const c_char;
 
     pub fn ocio_format_metadata_get_attribute_value_by_index(
         metadata: *mut c_void,
         i: i32,
-    ) -> *const i8;
+    ) -> *const c_char;
 
     pub fn ocio_format_metadata_get_attribute_value(
         metadata: *mut c_void,
-        name: *const i8,
-    ) -> *const i8;
+        name: *const c_char,
+    ) -> *const c_char;
 
     pub fn ocio_format_metadata_get_child_element(metadata: *mut c_void, i: i32) -> *mut c_void;
 
-    pub fn ocio_format_metadata_get_element_name(metadata: *mut c_void) -> *const i8;
+    pub fn ocio_format_metadata_get_element_name(metadata: *mut c_void) -> *const c_char;
 
-    pub fn ocio_format_metadata_get_element_value(metadata: *mut c_void) -> *const i8;
+    pub fn ocio_format_metadata_get_element_value(metadata: *mut c_void) -> *const c_char;
 
-    pub fn ocio_format_metadata_get_id(metadata: *mut c_void) -> *const i8;
+    pub fn ocio_format_metadata_get_id(metadata: *mut c_void) -> *const c_char;
 
-    pub fn ocio_format_metadata_get_name(metadata: *mut c_void) -> *const i8;
+    pub fn ocio_format_metadata_get_name(metadata: *mut c_void) -> *const c_char;
 
     pub fn ocio_format_metadata_get_num_attributes(metadata: *mut c_void) -> i32;
 
     pub fn ocio_format_metadata_get_num_children_elements(metadata: *mut c_void) -> i32;
 
-    pub fn ocio_format_metadata_set_element_name(metadata: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_format_metadata_set_element_name(metadata: *mut c_void, name: *const c_char) -> ();
 
-    pub fn ocio_format_metadata_set_element_value(metadata: *mut c_void, value: *const i8) -> ();
+    pub fn ocio_format_metadata_set_element_value(metadata: *mut c_void, value: *const c_char) -> ();
 
-    pub fn ocio_format_metadata_set_id(metadata: *mut c_void, id: *const i8) -> ();
+    pub fn ocio_format_metadata_set_id(metadata: *mut c_void, id: *const c_char) -> ();
 
-    pub fn ocio_format_metadata_set_name(metadata: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_format_metadata_set_name(metadata: *mut c_void, name: *const c_char) -> ();
 
-    pub fn ocio_gpu_shader_desc_get_cache_id(desc: *mut c_void) -> *const i8;
-    pub fn ocio_gpu_shader_desc_begin(shader_desc: *mut c_void, uid: *const i8) -> ();
+    pub fn ocio_gpu_shader_desc_get_cache_id(desc: *mut c_void) -> *const c_char;
+    pub fn ocio_gpu_shader_desc_begin(shader_desc: *mut c_void, uid: *const c_char) -> ();
     pub fn ocio_gpu_shader_desc_end(shader_desc: *mut c_void) -> ();
     pub fn ocio_gpu_shader_desc_get_next_resource_index(shader_desc: *mut c_void) -> u32;
     pub fn ocio_gpu_shader_desc_add_to_parameter_declare_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_add_to_texture_declare_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_add_to_helper_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_add_to_function_header_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_add_to_function_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_add_to_function_footer_shader_code(
         shader_desc: *mut c_void,
-        shader_code: *const i8,
+        shader_code: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_create_shader_text(
         shader_desc: *mut c_void,
-        shader_parameter_declarations: *const i8,
-        shader_texture_declarations: *const i8,
-        shader_helper_methods: *const i8,
-        shader_function_header: *const i8,
-        shader_function_body: *const i8,
-        shader_function_footer: *const i8,
+        shader_parameter_declarations: *const c_char,
+        shader_texture_declarations: *const c_char,
+        shader_helper_methods: *const c_char,
+        shader_function_header: *const c_char,
+        shader_function_body: *const c_char,
+        shader_function_footer: *const c_char,
     ) -> ();
     pub fn ocio_gpu_shader_desc_finalize(shader_desc: *mut c_void) -> ();
 
-    pub fn ocio_gpu_shader_desc_get_function_name(shader_desc: *mut c_void) -> *const i8;
+    pub fn ocio_gpu_shader_desc_get_function_name(shader_desc: *mut c_void) -> *const c_char;
 
     pub fn ocio_gpu_shader_desc_get_language(shader_desc: *mut c_void) -> i32;
 
-    pub fn ocio_gpu_shader_desc_get_pixel_name(shader_desc: *mut c_void) -> *const i8;
+    pub fn ocio_gpu_shader_desc_get_pixel_name(shader_desc: *mut c_void) -> *const c_char;
 
-    pub fn ocio_gpu_shader_desc_get_unique_id(shader_desc: *mut c_void) -> *const i8;
+    pub fn ocio_gpu_shader_desc_get_unique_id(shader_desc: *mut c_void) -> *const c_char;
 
-    pub fn ocio_gpu_shader_desc_get_resource_prefix(shader_desc: *mut c_void) -> *const i8;
+    pub fn ocio_gpu_shader_desc_get_resource_prefix(shader_desc: *mut c_void) -> *const c_char;
 
     pub fn ocio_gpu_shader_desc_get_descriptor_set_index(shader_desc: *mut c_void) -> u32;
 
@@ -2370,19 +2370,19 @@ unsafe extern "C" {
 
     pub fn ocio_gpu_shader_desc_get_texture_max_width(desc: *mut c_void) -> u32;
 
-    pub fn ocio_gpu_shader_desc_get_texture_uid(desc: *mut c_void, index: i32) -> *const i8;
+    pub fn ocio_gpu_shader_desc_get_texture_uid(desc: *mut c_void, index: i32) -> *const c_char;
 
-    pub fn ocio_gpu_shader_desc_set_function_name(shader_desc: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_gpu_shader_desc_set_function_name(shader_desc: *mut c_void, name: *const c_char) -> ();
 
     pub fn ocio_gpu_shader_desc_set_language(shader_desc: *mut c_void, language: i32) -> ();
 
-    pub fn ocio_gpu_shader_desc_set_pixel_name(shader_desc: *mut c_void, name: *const i8) -> ();
+    pub fn ocio_gpu_shader_desc_set_pixel_name(shader_desc: *mut c_void, name: *const c_char) -> ();
 
-    pub fn ocio_gpu_shader_desc_set_unique_id(shader_desc: *mut c_void, uid: *const i8) -> ();
+    pub fn ocio_gpu_shader_desc_set_unique_id(shader_desc: *mut c_void, uid: *const c_char) -> ();
 
     pub fn ocio_gpu_shader_desc_set_resource_prefix(
         shader_desc: *mut c_void,
-        prefix: *const i8,
+        prefix: *const c_char,
     ) -> ();
 
     pub fn ocio_gpu_shader_desc_set_descriptor_set_index(

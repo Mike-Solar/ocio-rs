@@ -1,4 +1,4 @@
-use std::ffi::c_void;
+use std::ffi::{c_char, c_void};
 use std::ptr::NonNull;
 
 use crate::transform::TransformHandle;
@@ -3229,7 +3229,7 @@ impl Config {
     pub fn try_set_family_separator(&self, separator: char) -> Result<()> {
         crate::clear_last_error();
         unsafe {
-            ocio_sys::ocio_config_set_family_separator(self.handle.as_ptr(), separator as i8);
+            ocio_sys::ocio_config_set_family_separator(self.handle.as_ptr(), separator as c_char);
         }
         crate::ocio_call_status()
     }

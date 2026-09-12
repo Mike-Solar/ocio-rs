@@ -1,4 +1,4 @@
-use std::ffi::c_void;
+use std::ffi::{c_char, c_void};
 use std::ptr::NonNull;
 
 use crate::transform::{transform_from_raw_handle, GroupTransform, Transform};
@@ -1282,7 +1282,7 @@ impl GpuTextureDimensions {
     }
 }
 
-fn required_ocio_string(ptr: *const i8) -> Option<String> {
+fn required_ocio_string(ptr: *const c_char) -> Option<String> {
     let value = unsafe { cstr_to_opt_string(ptr) }?;
     if value.is_empty() {
         None

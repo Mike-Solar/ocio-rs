@@ -1,4 +1,4 @@
-use std::ffi::c_void;
+use std::ffi::{c_char, c_void};
 use std::ptr::NonNull;
 
 use super::{transform_from_raw_handle, Transform, TransformHandle};
@@ -123,7 +123,7 @@ impl GroupTransform {
         since = "0.2.0",
         note = "raw OCIO ostream entry point; prefer write_to_string(&Config, format_name) for Rust callers"
     )]
-    pub unsafe fn write(&self, config: *mut c_void, format_name: *const i8, os: *mut c_void) {
+    pub unsafe fn write(&self, config: *mut c_void, format_name: *const c_char, os: *mut c_void) {
         crate::clear_last_error();
         unsafe {
             ocio_sys::ocio_group_transform_write(self.handle.as_ptr(), config, format_name, os);
